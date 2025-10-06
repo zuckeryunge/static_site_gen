@@ -28,6 +28,31 @@ class TextNode():
     def __repr__(self):
         return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
 
+
+
+def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    output = []
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT:
+            output.append(TextNode(node.text, node.text_type))
+
+        else:
+            if node.text.count(delimiter)%2 != 0:
+                raise Exception("could not resolve .split(). Insufficent delimiter count.")
+
+            else:
+                odd = True
+                for text in node.text.split(delimiter):
+                    if odd == True:
+                        output.append(TextNode(text, TextType.TEXT))
+                        odd = False
+                    else:
+                        output.append(TextNode(text, text_type))
+                        odd = True
+    
+    return output
+
+
 def text_node_to_html_node(text_node):
     if text_node.text_type == TextType.TEXT:
         return LeafNode(None, text_node.text)
