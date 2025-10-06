@@ -71,7 +71,6 @@ class TestTextNodeSplitWithDelimiter(unittest.TestCase):
         node = TextNode("`code is` already at the start", TextType.TEXT)
         new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
         split_nodes =  [
-            TextNode("", TextType.TEXT),
             TextNode("code is", TextType.CODE),
             TextNode(" already at the start", TextType.TEXT),
         ]
@@ -81,7 +80,6 @@ class TestTextNodeSplitWithDelimiter(unittest.TestCase):
         node = TextNode("`code is` already at the start `but also` at the back. **but wait** there's more.", TextType.TEXT)
         new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
         split_nodes =  [
-            TextNode("", TextType.TEXT),
             TextNode("code is", TextType.CODE),
             TextNode(" already at the start ", TextType.TEXT),
             TextNode("but also", TextType.CODE),
@@ -96,7 +94,6 @@ class TestTextNodeSplitWithDelimiter(unittest.TestCase):
         newer_nodes = split_nodes_delimiter(new_nodes, "**", TextType.BOLD)
 
         split_nodes =  [
-            TextNode("", TextType.TEXT),
             TextNode("code is", TextType.CODE),
             TextNode(" already at the start ", TextType.TEXT),
             TextNode("but also", TextType.CODE),

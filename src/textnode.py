@@ -34,7 +34,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     output = []
     for node in old_nodes:
         if node.text_type != TextType.TEXT:
-            output.append(TextNode(node.text, node.text_type))
+            output.append(node)
 
         else:
             if node.text.count(delimiter)%2 != 0:
@@ -43,12 +43,12 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             else:
                 odd = True
                 for text in node.text.split(delimiter):
-                    if odd == True:
-                        output.append(TextNode(text, TextType.TEXT))
-                        odd = False
-                    else:
-                        output.append(TextNode(text, text_type))
-                        odd = True
+                    if text != "":
+                        if odd == True:
+                            output.append(TextNode(text, TextType.TEXT))
+                        else:
+                            output.append(TextNode(text, text_type))
+                    odd = not odd
     
     return output
 
