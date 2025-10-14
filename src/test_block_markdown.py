@@ -1,5 +1,6 @@
 import unittest
-from block_markdown import markdown_to_blocks
+from block_markdown import BlockType, block_to_block_type, markdown_to_blocks
+
 
 
 class TestMarkdownToBlocks(unittest.TestCase):
@@ -23,6 +24,36 @@ This is the same paragraph on a new line
                 "- This is a list\n- with items",
             ],
         )
+
+class TestBlockTypeAsserter(unittest.TestCase):
+
+    def test_block_to_block_types(self):
+        many_blocks = [
+            "this is just paragraph",
+            "# heading",
+            "```code\ncode\nmore code```",
+            """>quote this
+>qoute that
+>quote anything you like""",
+            "- check me out\n- nananana\n- yeah",
+            "1. you should\n2. brush your\n3. dirty feet",
+        ]
+        blocktype_list = []
+        for block in many_blocks:
+            blocktype = block_to_block_type(block)
+            blocktype_list.append(blocktype.value)
+        
+        self.assertEqual(
+                blocktype_list,
+                [
+                    "paragraph",
+                    "heading",
+                    "code",
+                    "quote",
+                    "unordered_list",
+                    "ordered_list",
+                ]
+            )
 
 if __name__ == "__main__":
     unittest.main()
