@@ -25,7 +25,7 @@ def markdown_to_blocks(markdown):
 
 def block_to_block_type(block):
     block_type = BlockType.PARAGRAPH
-    if block.startswith("# ", "## ", "### ", "#### ", "##### ", "###### "):
+    if block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
         block_type = BlockType.HEADING
     if block[:3] == block[-3:] == "```":
         block_type = BlockType.CODE
