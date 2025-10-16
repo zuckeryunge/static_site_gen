@@ -1,6 +1,8 @@
 from enum import Enum
 import re
 from htmlnode import LeafNode, ParentNode
+from textnode import TextNode, text_node_to_html_node
+from inline_markdown import text_to_textnodes
 
 class BlockType(Enum):
     PARAGRAPH = "paragraph"
@@ -83,8 +85,22 @@ def strip_markdown_from_block(block, block_type):
 
 
 
-def get_inline_text_nodes(text):
-    return ["write me!"]
+def get_inline_html_nodes(text):
+    lines_to_nodes_list = []
+    for line in text:
+        textnode_line = []
+        textnode_line.extend(text_to_textnodes(line))
+        lines_to_nodes_list.append(textnode_line)
+
+    htmlnode_line_list = []
+    for node_line in lines_to_nodes_list:
+        htmlnode_line = []
+        for node in node_line:
+            htmlnode_line.append(text_node_to_html_node(node))
+        htmlnode_line_list.append(htmlnode_line)
+
+    return htmlnode_line_list
+
 
 
 
@@ -97,14 +113,24 @@ def markdown_to_html_node(markdown):
         block_type = block_to_block_type(block)
         
         if block_type == "paragraph":
-            pass
+            tag = "p"
+            # get all the inline html nodes
+            html_inline_nodes = get_inline_html_nodes(block)
+            # create the parent node (the block) for them
+            paragraph_node = ParentNode(tag, *html_inline_nodes)
+            # add all to the main node list
+            html_node_list.extend(html_inline_nodes)
+            html_node_list.append(paragraph_node)
 
         if block_type == "heading":
             tag = f"h{which_heading(block)}"
-            value = strip_markdown_from_block(block, block_type)
-            text_inline_nodes = get_inline_text_nodes(value)
-            heading_node = ParentNode(tag, text_inline_nodes)
-            html_node_list.extend(text_inline_nodes)
+            clean_content = strip_markdown_from_block(block, block_type)
+            # get all the inline html nodes
+            html_inline_nodes = get_inline_html_nodes(clean_content)
+            # create the parent node (the block) for them
+            heading_node = ParentNode(tag, *html_inline_nodes)
+            # add all to the main node list
+            html_node_list.extend(html_inline_nodes)
             html_node_list.append(heading_node)
 
         if block_type == "code":
