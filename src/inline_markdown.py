@@ -9,7 +9,8 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
         else:
             if node.text.count(delimiter)%2 != 0:
-                raise Exception("could not resolve .split(). Insufficent delimiter count.")
+                print(f"delimiter_count: {node.text.count(delimiter)}")
+                raise Exception(f"could not resolve .split('{delimiter}'). Insufficent delimiter count.")
 
             else:
                 odd = True

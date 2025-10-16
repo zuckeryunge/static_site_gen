@@ -110,25 +110,27 @@ def markdown_to_html_node(markdown):
 
     # get blocks into nodes and put them into a list
     for block in split_to_blocks:
-        block_type = block_to_block_type(block)
-        
+        block_type = block_to_block_type(block).value
+        print("yikes") 
         if block_type == "paragraph":
             tag = "p"
+            print(tag)
             # get all the inline html nodes
             html_inline_nodes = get_inline_html_nodes(block)
             # create the parent node (the block) for them
-            paragraph_node = ParentNode(tag, *html_inline_nodes)
+            paragraph_node = ParentNode(tag, html_inline_nodes)
             # add all to the main node list
             html_node_list.extend(html_inline_nodes)
             html_node_list.append(paragraph_node)
 
         if block_type == "heading":
             tag = f"h{which_heading(block)}"
+            print(tag)
             clean_content = strip_markdown_from_block(block, block_type)
             # get all the inline html nodes
             html_inline_nodes = get_inline_html_nodes(clean_content)
             # create the parent node (the block) for them
-            heading_node = ParentNode(tag, *html_inline_nodes)
+            heading_node = ParentNode(tag, html_inline_nodes)
             # add all to the main node list
             html_node_list.extend(html_inline_nodes)
             html_node_list.append(heading_node)
@@ -151,7 +153,7 @@ def markdown_to_html_node(markdown):
 
 
     # set blocks_node_list as master-div-children
-    master_node = ParentNode("div", None, html_node_list)
+    master_node = ParentNode("div", html_node_list)
     # return master_node
     return master_node
 
