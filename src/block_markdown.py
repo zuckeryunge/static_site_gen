@@ -57,7 +57,7 @@ def block_to_block_type(block):
 
 def which_heading(string):
     heading = re.findall("^(#+) ", string)
-    h_hierarchy = heading.count("#")
+    h_hierarchy = len(*heading)
     if 1 < h_hierarchy > 6:
         raise Exception("Not a Heading")
     return h_hierarchy
