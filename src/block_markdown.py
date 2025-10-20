@@ -64,23 +64,47 @@ def which_heading(string):
 
 
 
-def strip_markdown_from_block(block, block_type):
+def get_tag(block, block_type):
+
+    if block_type == "paragraph":
+        return "p"
+
+    if block_type == "heading":
+        return f"h{which_heading(block)}"
 
     if block_type == "code":
-        block = block[4:-3]
-        return block
+        return "pre"
+
+    if block_type == "quote":
+        return "blockquote"
+
+    if block_type == "unordered_list":
+        return "ul"
+
+    if block_type == "ordered_list":
+        return "ol"
+
+
+
+def strip_markdown_from_block(block, block_type):
+
+    if block_type == "paragraph":
+        return block.replace("\n", " ")
 
     if block_type == "heading":
         block = block.replace("\n", " ")
         return block.strip("# ")
+
+    if block_type == "code":
+        return block[4:-3]
 
     if block_type == "quote":
         lines = []
         for line in block.split("\n"):
             if line != "":
                 lines.append(line[1:])
-        block = " ".join(lines)
-        return block
+        block = "".join(lines)
+        return block.strip()
 
     if block_type == "unordered_list":
         lines = []
@@ -99,20 +123,37 @@ def strip_markdown_from_block(block, block_type):
         
 
 def get_inline_html_nodes(list_with_strings):
-    lines_to_nodes_list = []
-    for line in list_with_strings:
-        textnode_line = []
-        textnode_line.extend(text_to_textnodes(line))
-        lines_to_nodes_list.append(textnode_line)
 
-    htmlnode_line_list = []
-    for node_line in lines_to_nodes_list:
+    if type(list_with_strings) != list:
+        # converting one line of text into text_nodes
+        textnode_line = text_to_textnodes(list_with_strings)
+
         htmlnode_line = []
-        for node in node_line:
+        # converting the text_nodes into hmtl_nodes and packing in a line
+        for node in textnode_line:
             htmlnode_line.append(text_node_to_html_node(node))
-        htmlnode_line_list.append(htmlnode_line)
 
-    return htmlnode_line_list
+        return htmlnode_line
+
+    else:
+        # handling multiline node_blocks
+        lines_to_nodes_list = []
+        # unpacking the block into lines, converting the lines into text_nodes
+        for line in list_with_strings:
+            textnode_line = text_to_textnodes(line)
+            lines_to_nodes_list.append(textnode_line)
+
+        htmlnode_line_list = []
+        # unpacking the list of list of text_nodes
+        for node_line in lines_to_nodes_list:
+            htmlnode_line = []
+            # convert each line of text_nodes into their html_node equivalent
+            for node in node_line:
+                htmlnode_line.append(text_node_to_html_node(node))
+            # collection the html_node_lines into a node_block again 
+            htmlnode_line_list.append(htmlnode_line)
+
+        return htmlnode_line_list
 
 
 
@@ -122,76 +163,36 @@ def markdown_to_html_node(markdown):
 
     # get blocks into nodes and put them into a list
     for block in split_to_blocks:
+
         block_type = block_to_block_type(block).value
-
-        if block_type == "code":
-            value = strip_markdown_from_block(block, block_type)
-            code_node = LeafNode("code", value)
-            pre_node = ParentNode("pre", [code_node])
-            html_node_list.append(pre_node)
-
+        child_nodes = []
+        tag = get_tag(block, block_type)
+        clean_content= strip_markdown_from_block(block, block_type)
+        
         if block_type == "paragraph":
-            tag = "p"
-            block = block.replace("\n", " ")
             # get all the inline html nodes
-            html_inline_nodes = get_inline_html_nodes([block])
-            # create the parent node (the block) for them
-            paragraph_node = ParentNode(tag, *html_inline_nodes)
-            # add all to the main node list
-            html_node_list.append(paragraph_node)
+            child_nodes = get_inline_html_nodes(clean_content)
 
         if block_type == "heading":
-            tag = f"h{which_heading(block)}"
-            print(tag)
-            clean_content = strip_markdown_from_block(block, block_type)
             # get all the inline html nodes
-            html_inline_nodes = get_inline_html_nodes([clean_content])
-            # create the parent node (the block) for them
-            heading_node = ParentNode(tag, *html_inline_nodes)
-            # add all to the main node list
-            html_node_list.append(heading_node)
+            child_nodes = get_inline_html_nodes(clean_content)
 
-                    
+        if block_type == "code":
+            child_nodes = [LeafNode("code", clean_content)]
+
         if block_type == "quote":
-            tag = "blockquote"
-            clean_content = strip_markdown_from_block(block, block_type)
             # get all the inline html nodes
-            html_inline_nodes = get_inline_html_nodes([clean_content])
-            # create the parent node (the block) for them
-            quote_node = ParentNode(tag, *html_inline_nodes)
-            # add all to the main node list
-            html_node_list.append(quote_node)
+            child_nodes = get_inline_html_nodes(clean_content)
         
-        if block_type == "unordered_list":
-            tag = "ul"
-            clean_content = strip_markdown_from_block(block, block_type)
+        if block_type == "unordered_list" or block_type == "ordered_list":
             # get all the inline html nodes
-            html_inline_nodes = get_inline_html_nodes(clean_content)
+            grandchild_nodes = get_inline_html_nodes(clean_content)
             # create the parent node (the block) for them
-            li_nodes = []
-            for list_item in html_inline_nodes:
-                li_nodes.append(ParentNode("li", list_item))
+            for line_list in grandchild_nodes:
+                child_nodes.append(ParentNode("li", line_list))
 
-            ul_node = ParentNode(tag, li_nodes)
-            # add all to the main node list
-            html_node_list.append(ul_node)
-
-
-        if block_type == "ordered_list":
-            tag = "ol"
-            clean_content = strip_markdown_from_block(block, block_type)
-            # get all the inline html nodes
-            html_inline_nodes = get_inline_html_nodes(clean_content)
-            # create the parent node (the block) for them
-            li_nodes = []
-            for list_item in html_inline_nodes:
-                li_nodes.append(ParentNode("li", list_item))
-
-            ol_node = ParentNode(tag, li_nodes)
-            # add all to the main node list
-            html_node_list.append(ol_node)
-
-
+        block_node = ParentNode(tag, child_nodes)
+        html_node_list.append(block_node)
 
     # set blocks_node_list as master-div-children
     master_node = ParentNode("div", html_node_list)
