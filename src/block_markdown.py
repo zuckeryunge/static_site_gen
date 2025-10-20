@@ -1,7 +1,7 @@
 from enum import Enum
 import re
 from htmlnode import LeafNode, ParentNode
-from textnode import TextNode, text_node_to_html_node
+from textnode import text_node_to_html_node
 from inline_markdown import text_to_textnodes
 
 class BlockType(Enum):
@@ -65,26 +65,36 @@ def which_heading(string):
 
 
 def strip_markdown_from_block(block, block_type):
+
     if block_type == "code":
-        return block.strip("\n` ")
+        block = block[4:-3]
+        return block
+
     if block_type == "heading":
         block = block.replace("\n", " ")
         return block.strip("# ")
+
     if block_type == "quote":
-        block = block.replace("\n>", " ")
-        return block.strip(">")
+        lines = []
+        for line in block.split("\n"):
+            if line != "":
+                lines.append(line[1:])
+        block = " ".join(lines)
+        return block
+
     if block_type == "unordered_list":
-        block = block.split("\n")
-        clean_lines = [] 
-        for line in block:
-            clean_lines.append(line[2:])
-        return clean_lines
+        lines = []
+        for line in block.split("\n"):
+            if line != "":
+                lines.append(line[2:])
+        return lines
+
     if block_type == "ordered_list":
-        block = block.split("\n")
-        clean_lines = []
-        for line in block:
-            clean_lines.append(line[3:])
-        return clean_lines
+        lines = []
+        for line in block.split("\n"):
+            if line != "":
+                lines.append(line[3:])
+        return lines
 
         
 
