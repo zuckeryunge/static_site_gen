@@ -41,3 +41,14 @@ def copy_src_to_dest_recursively(src, dest):
     else:
         print(f"-o-o-o empy directory: {src}")
 
+
+
+def extract_title(markdown):
+    split_md = markdown.split("\n")
+    for line in split_md:
+        if line.startswith("# "):
+            return line[2:]
+    raise Exception("yo, there is no heading")
+
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path}using {template_path}")
