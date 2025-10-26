@@ -1,5 +1,8 @@
 import os
 import shutil
+from block_markdown import markdown_to_html_node
+from htmlnode import HTMLNode
+import htmlnode 
 
 
 
@@ -51,4 +54,33 @@ def extract_title(markdown):
     raise Exception("yo, there is no heading")
 
 def generate_page(from_path, template_path, dest_path):
-    print(f"Generating page from {from_path} to {dest_path}using {template_path}")
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    # reading and saving contents of the files
+    open_from = open(from_path)
+    markdown_src = open_from.read()
+    open_from.close()
+    open_template = open(template_path)
+    template_src = open_template.read()
+    open_template.close()
+    # converting markdown to html_code
+    html_node = markdown_to_html_node(markdown_src)
+    html_string = html_node.to_html()
+    # setting title of the hmtl doc
+    html_title = extract_title(markdown_src)
+    html_doc = template_src.replace("{{ Title }}", html_title)
+    # inserting the content <div> into the html doc <body>
+    html_doc = html_doc.replace("{{ Content }}", html_string)
+    # creating destinatioin directory and file
+    split_path = dest_path.split("/")
+    if len(split_path) > 1:
+        dir_path = "/".join(split_path[:-1])
+        os.makedirs(dir_path)
+        file_path = dir_path + "/" + split_path[-1:]
+    else:
+        file_path = dest_path
+    write_file = open(file_path, "w")
+    write_file.write(html_doc)
+    write_file.close()
+
+
+        
