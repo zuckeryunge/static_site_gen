@@ -1,8 +1,6 @@
 import os
 import shutil
 from block_markdown import markdown_to_html_node
-from htmlnode import HTMLNode
-import htmlnode 
 
 
 
@@ -74,8 +72,8 @@ def generate_page(from_path, template_path, dest_path):
     split_path = dest_path.split("/")
     if len(split_path) > 1:
         dir_path = "/".join(split_path[:-1])
-        os.makedirs(dir_path)
-        file_path = dir_path + "/" + split_path[-1:]
+        os.makedirs(dir_path, exist_ok=True)
+        file_path = dir_path + "/" + split_path[-1]
     else:
         file_path = dest_path
     write_file = open(file_path, "w")
