@@ -1,13 +1,19 @@
-from generate_webpage import copy_static_to_public_dir, generate_page
+import sys
+from generate_webpage import copy_static_to_public_dir, generate_pages_recursive
 
 
 
 def main():
+    if len(sys.argv) == 2:
+        basepath = sys.argv[1]
+    else:
+        basepath = "/"
     path_to_static = "./static"
-    path_to_public = "./public"
+    path_to_public = f".{basepath}docs"
+    path_to_content = "./content"
+    path_to_template = "./template.html"
 
     copy_static_to_public_dir(path_to_static, path_to_public)
-    
-    generate_page("./content/index.md", "./template.html", path_to_public + "/index.html")
+    generate_pages_recursive(basepath, path_to_content, path_to_template, path_to_public)
 
 main()

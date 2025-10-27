@@ -22,7 +22,7 @@ def copy_static_to_public_dir(src, dest):
 
 def copy_src_to_dest_recursively(src, dest):
     if not os.path.exists(dest):
-        os.mkdir(dest)
+        os.makedirs(dest)
         print(f"--- created directory {dest}")
             
     inside_src = os.listdir(src)
@@ -55,7 +55,7 @@ def extract_title(markdown):
 
 
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(basepath, from_path, template_path, dest_path):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     # reading and saving contents of the files
     open_from = open(from_path)
@@ -72,6 +72,9 @@ def generate_page(from_path, template_path, dest_path):
     html_doc = template_src.replace("{{ Title }}", html_title)
     # inserting the content <div> into the html doc <body>
     html_doc = html_doc.replace("{{ Content }}", html_string)
+    # setting basepath for hyperlinks
+    html_doc.replace('href="/', f'href="{basepath}')
+    html_doc.replace('src="/', f'src="{basepath}')
     # creating destinatioin directory and file
     split_path = dest_path.split("/")
     if len(split_path) > 1:
@@ -86,29 +89,32 @@ def generate_page(from_path, template_path, dest_path):
 
 
     
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(basepath, dir_path_content, template_path, dest_dir_path):
     # Crawl every entry in the content directory
     print("--------- generating page ----------")
     if not os.path.exists(dest_dir_path):
         os.mkdir(dest_dir_path)
         print(f"--- created directory {dest_dir_path}")
-            
+    # look into folder, list contents
+    # convert and copy md files
+    # go deeper into folders
+    # if no md: exception
     inside_src = os.listdir(dir_path_content)
     print(f"--- {len(inside_src)} items in {dir_path_content}")
     if len(inside_src) > 0: 
-        print(f">->->- opening branch")
         for item in inside_src:
             new_src = os.path.join(dir_path_content, item)
-            new_dest = os.path.join(dest_dir_path, item)
 
+    # For each markdown file found, generate a new .html file using the same template.html. The generated pages should be written to the public directory in the same directory structure.
             if os.path.isfile(new_src):
-                shutil.copy(new_src, new_dest)
-                print(f"--- copied {item} from {dir_path_content} to {dest_dir_path}")
+                if item[-3:] != ".md":
+                    raise Exception(f"file: {item} ist no markdown file (.md)")
+                item_html = item[:-2] + "html"
+                new_dest = os.path.join(dest_dir_path, item_html)
+                generate_page(basepath, new_src, template_path, new_dest)
+                print(f"--- generated {item_html} from {dir_path_content} to {dest_dir_path}")
             else:
-                copy_src_to_dest_recursively(new_src, new_dest)
-        print(f"<-<-<- finished branch")
+                new_dest = os.path.join(dest_dir_path, item)
+                generate_pages_recursive(basepath, new_src, template_path, new_dest)
     else:
         print(f"-o-o-o empy directory: {dir_path_content}")
-    # For each markdown file found, generate a new .html file using the same template.html. The generated pages should be written to the public directory in the same directory structure.
-    pass
-    # don't forget to update main.sh funtion calling and arguments
