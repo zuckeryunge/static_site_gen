@@ -6,6 +6,7 @@ from generate_webpage import copy_static_to_public_dir, generate_pages_recursive
 def main():
     if len(sys.argv) == 2:
         basepath = sys.argv[1]
+        print("bp",basepath)
     else:
         basepath = "/"
     path_to_static = "./static"

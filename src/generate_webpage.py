@@ -73,8 +73,8 @@ def generate_page(basepath, from_path, template_path, dest_path):
     # inserting the content <div> into the html doc <body>
     html_doc = html_doc.replace("{{ Content }}", html_string)
     # setting basepath for hyperlinks
-    html_doc.replace('href="/', f'href="{basepath}')
-    html_doc.replace('src="/', f'src="{basepath}')
+    html_doc = html_doc.replace('href="/', f'href="{basepath}')
+    html_doc = html_doc.replace('src="/', f'src="{basepath}')
     # creating destinatioin directory and file
     split_path = dest_path.split("/")
     if len(split_path) > 1:
