@@ -29,11 +29,13 @@ class LeafNode(HTMLNode):
         return f"HTMLNode({self.tag}, {self.value}, {self.props})"
 
     def to_html(self):
-        print(f"--- yeye - {self.value}")
-        if self.value == None or self.value == "":
-            output_string = f"<{self.tag}{self.props_to_html()}>THIS HAS NOTHING</{self.tag}>"
+        if self.tag == "img":
+            if self.value != "":
+                raise Exception("Image must have no Value input")
+            output_string = f"<{self.tag}{self.props_to_html()}>"
             return output_string
-            # raise ValueError("Leaf needs Value")
+        if self.value == None or self.value == "":
+            raise ValueError("Leaf needs Value")
         if self.tag == None:
             return self.value
         else:
@@ -48,7 +50,6 @@ class ParentNode(HTMLNode):
         return f"HTMLNode({self.tag}, children: {self.children}, {self.props})"
 
     def to_html(self):
-        print(f"--- pepe - {self.value}")
         if self.tag == None or self.tag == "":
             raise ValueError("Parent needs Tag")
         if self.children == None or self.children == "":

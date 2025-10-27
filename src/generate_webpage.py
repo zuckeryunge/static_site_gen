@@ -51,6 +51,10 @@ def extract_title(markdown):
             return line[2:]
     raise Exception("yo, there is no heading")
 
+
+
+
+
 def generate_page(from_path, template_path, dest_path):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     # reading and saving contents of the files
@@ -81,4 +85,9 @@ def generate_page(from_path, template_path, dest_path):
     write_file.close()
 
 
-        
+    
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    # Crawl every entry in the content directory
+    # For each markdown file found, generate a new .html file using the same template.html. The generated pages should be written to the public directory in the same directory structure.
+    pass
+    # don't forget to update main.sh funtion calling and arguments

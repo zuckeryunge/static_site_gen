@@ -48,7 +48,6 @@ def split_nodes_image(old_nodes):
                     image_alt = image[0]
                     image_link = image[1]
                     new_text = old_text.split(f"![{image_alt}]({image_link})",1)
-                    print(f"HEY {new_text}")
                     old_text = new_text[1]
                     if new_text[0] != "":
                         split_node.append(TextNode(new_text[0], TextType.TEXT))
@@ -58,7 +57,6 @@ def split_nodes_image(old_nodes):
                 total_split.extend(split_node)
         else:
             total_split.append(old_node)
-    print(f"angehaengt {total_split}")
     return total_split
 
 
