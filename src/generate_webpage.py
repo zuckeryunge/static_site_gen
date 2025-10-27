@@ -88,6 +88,27 @@ def generate_page(from_path, template_path, dest_path):
     
 def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
     # Crawl every entry in the content directory
+    print("--------- generating page ----------")
+    if not os.path.exists(dest_dir_path):
+        os.mkdir(dest_dir_path)
+        print(f"--- created directory {dest_dir_path}")
+            
+    inside_src = os.listdir(dir_path_content)
+    print(f"--- {len(inside_src)} items in {dir_path_content}")
+    if len(inside_src) > 0: 
+        print(f">->->- opening branch")
+        for item in inside_src:
+            new_src = os.path.join(dir_path_content, item)
+            new_dest = os.path.join(dest_dir_path, item)
+
+            if os.path.isfile(new_src):
+                shutil.copy(new_src, new_dest)
+                print(f"--- copied {item} from {dir_path_content} to {dest_dir_path}")
+            else:
+                copy_src_to_dest_recursively(new_src, new_dest)
+        print(f"<-<-<- finished branch")
+    else:
+        print(f"-o-o-o empy directory: {dir_path_content}")
     # For each markdown file found, generate a new .html file using the same template.html. The generated pages should be written to the public directory in the same directory structure.
     pass
     # don't forget to update main.sh funtion calling and arguments
