@@ -9,7 +9,7 @@ def main():
     else:
         basepath = "/"
     path_to_static = "./static"
-    path_to_public = f".{basepath}docs"
+    path_to_public = "./docs"
     path_to_content = "./content"
     path_to_template = "./template.html"
 
